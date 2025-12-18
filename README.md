@@ -21,3 +21,4 @@ That's it! The script will handle opening all the necessary windows for you.
 
 ## 3. Output
 *   The received file will appear in the `decrypted_output` folder.
+* logs will be in logs folder
