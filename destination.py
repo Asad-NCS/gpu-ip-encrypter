@@ -1,22 +1,40 @@
 import socket
 import logging
-
+import config
+import os 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 
-HOST = "127.0.0.1"
-PORT = 12345
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/destination.log", mode='w'),
+        logging.StreamHandler()
+    ]
+)
+
+def hex_dump(data, max_bytes=64):
+    """Return hex dump of data for logging"""
+    snippet = data[:max_bytes]
+    hex_str = ' '.join(f'{b:02x}' for b in snippet)
+    if len(data) > max_bytes:
+        hex_str += f' ... ({len(data)} bytes total)'
+    return hex_str
 
 def start_server():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        sock.bind((HOST, PORT))
-        logging.info(f"Destination listening on {HOST}:{PORT}")
+        # Bind to 0.0.0.0 to receive from any interface
+        bind_host = "0.0.0.0"
+        sock.bind((bind_host, config.DESTINATION_PORT))
+        logging.info(f"Destination listening on {bind_host}:{config.DESTINATION_PORT}")
         
         while True:
             data, addr = sock.recvfrom(65535)
             logging.info(f"Received packet from {addr}: {len(data)} bytes")
-            print(data)
+            logging.info(f"Payload: {hex_dump(data)}")
             # We expect raw payload here? Or the full packet?
             # The Decrypter sends "IP(src=OriginalSrc, dst=OriginalDst) / UDP / Payload"
             # If Decrypter uses raw socket or scapy send, it sends a full IP packet.
@@ -25,7 +43,6 @@ def start_server():
             # and gives the payload to this socket.
             
             
-            logging.info(f"Payload: {data[:20]}...")
 
     except Exception as e:
         logging.error(f"Error: {e}")

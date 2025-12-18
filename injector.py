@@ -2,12 +2,22 @@ import logging
 from scapy.all import rdpcap, IP
 import socket
 import time
+import config
+import os
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 
-ENCRYPTER_IP = "127.0.0.100"
-ENCRYPTER_PORT = 9999
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/injector.log", mode='w'),
+        logging.StreamHandler()
+    ]
+)
+
 PCAP_FILE = "test_traffic.pcap"
 
 def run_injector():
@@ -19,15 +29,15 @@ def run_injector():
     
     for i, pkt in enumerate(packets):
         if IP in pkt:
-            # We want to send the whole IP packet as data
-            # Scapy's bytes(pkt[IP]) gives the IP header + payload
+            # send the whole ip packet as data
+            # scapy makes this easy with bytes(pkt[IP])
             print(pkt[IP])
             data = bytes(pkt[IP])
             
-            sock.sendto(data, (ENCRYPTER_IP, ENCRYPTER_PORT))
+            sock.sendto(data, (config.ENCRYPTER_HOST, config.ENCRYPTER_PORT))
             logging.info(f"Injected packet {i+1}/{len(packets)}")
             
-            # Small delay to not overwhelm
+            # chill for a sec so we dont crash anything
             time.sleep(0.01)
             
     logging.info("Injection complete.")

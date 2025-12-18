@@ -1,0 +1,19 @@
+2025-12-19 00:54:01,572 - INFO - File receiver listening on 0.0.0.0:12345
+2025-12-19 00:54:01,572 - INFO - Writing to: decrypted_output\received_file.mp4
+2025-12-19 00:54:05,888 - INFO - Received 8192 bytes
+2025-12-19 00:54:05,893 - INFO - Received 16384 bytes
+2025-12-19 00:54:05,906 - INFO - Received 24576 bytes
+2025-12-19 00:54:05,917 - INFO - Received 32768 bytes
+2025-12-19 00:54:05,923 - INFO - Received 40960 bytes
+2025-12-19 00:54:05,932 - INFO - Received 49152 bytes
+2025-12-19 00:54:05,936 - INFO - Received 57344 bytes
+2025-12-19 00:54:15,293 - INFO - Received 10485760 bytes
+2025-12-19 00:54:15,299 - INFO - Received 10493952 bytes
+2025-12-19 00:54:15,306 - INFO - Received 10502144 bytes
+2025-12-19 00:54:15,312 - INFO - Received 10510336 bytes
+2025-12-19 00:54:15,317 - INFO - Received 10518528 bytes
+2025-12-19 00:54:15,330 - INFO - Received 10526720 bytes
+2025-12-19 00:54:15,336 - INFO - Received 10534912 bytes
+2025-12-19 00:54:15,342 - INFO - Received 10543104 bytes
+2025-12-19 00:54:22,597 - INFO - Timeout reached (no data for 5s). Assuming transfer complete.
+2025-12-19 00:54:22,598 - INFO - File saved: decrypted_output\received_file.mp4 (13021138 bytes)

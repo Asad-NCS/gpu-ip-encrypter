@@ -3,7 +3,7 @@ import pycuda.autoinit
 from pycuda.compiler import SourceModule
 import numpy as np
 
-# AES S-Box and constants generation
+# generate the s-box and constants we need for aes
 def make_sbox():
     sbox = [0] * 256
     p = 1
@@ -48,10 +48,10 @@ def make_rcon():
         rcon[i] &= 0xff
     return np.array(rcon, dtype=np.uint8)
 
-# Key Expansion (CPU)
+# expand the key on the cpu before sending to gpu
 def key_expansion(key, sbox, rcon):
-    # key is 16 bytes
-    w = [0] * 44 # 4 words * 11 rounds
+    # we're doing aes-128 so key is 16 bytes
+    w = [0] * 44 # need 44 words for the rounds
     
     def sub_word(word):
         return (int(sbox[(word >> 24) & 0xff]) << 24) | \
@@ -71,7 +71,7 @@ def key_expansion(key, sbox, rcon):
             temp = sub_word(rot_word(temp)) ^ (int(rcon[i//4]) << 24)
         w[i] = w[i-4] ^ temp
         
-    # Convert to bytes for GPU
+    # flatten it to bytes so the gpu can read it easily
     round_keys = []
     for word in w:
         round_keys.append((word >> 24) & 0xff)
@@ -255,8 +255,27 @@ class AESGpu:
         # Pad data
         padded_data = self.pad(data)
         data_np = np.frombuffer(padded_data, dtype=np.uint8)
-        num_blocks = len(data_np) // 16
         
+        #this line of code is to avoid TDR timeout and memory issues
+        # Process in chunks to avoid TDR timeout and memory issues
+        chunk_size = 50 * 1024 * 1024  # 50MB chunks
+        chunk_size = (chunk_size // 16) * 16  # Align to 16 bytes
+        
+        if len(data_np) <= chunk_size:
+            # Small data, process in one go
+            return self._encrypt_chunk(data_np)
+        
+        # Large data, process in chunks
+        result = b''
+        for i in range(0, len(data_np), chunk_size):
+            chunk = data_np[i:i+chunk_size]
+            result += self._encrypt_chunk(chunk)
+        
+        return result
+        #end of the function and updated on 16/12/2025
+    
+    def _encrypt_chunk(self, data_np):
+        num_blocks = len(data_np) // 16
         out_np = np.zeros_like(data_np)
         
         # GPU Alloc
@@ -278,8 +297,26 @@ class AESGpu:
 
     def decrypt(self, data):
         data_np = np.frombuffer(data, dtype=np.uint8)
-        num_blocks = len(data_np) // 16
         
+        # Process in chunks to avoid TDR timeout and memory issues
+        chunk_size = 50 * 1024 * 1024  # 50MB chunks
+        chunk_size = (chunk_size // 16) * 16  # Align to 16 bytes
+        
+        if len(data_np) <= chunk_size:
+            # Small data, process in one go
+            decrypted_padded = self._decrypt_chunk(data_np)
+            return self.unpad(decrypted_padded)
+        
+        # Large data, process in chunks
+        result = b''
+        for i in range(0, len(data_np), chunk_size):
+            chunk = data_np[i:i+chunk_size]
+            result += self._decrypt_chunk(chunk)
+        
+        return self.unpad(result)
+    
+    def _decrypt_chunk(self, data_np):
+        num_blocks = len(data_np) // 16
         out_np = np.zeros_like(data_np)
         
         in_gpu = cuda.mem_alloc(data_np.nbytes)
@@ -295,5 +332,6 @@ class AESGpu:
         
         cuda.memcpy_dtoh(out_np, out_gpu)
         
-        decrypted_padded = out_np.tobytes()
-        return self.unpad(decrypted_padded)
+        #whats returned now is the decrypted data before it was padded now its decrypted and padded
+        return out_np.tobytes()
+

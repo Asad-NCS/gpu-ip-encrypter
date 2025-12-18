@@ -9,6 +9,7 @@ print(f"Encrypted packets: {len(enc)}")
 diff_count = 0
 for o, e in zip(orig, enc):
     if IP in o and IP in e:
+        # check if the payload actually changed
         if bytes(o[IP].payload) != bytes(e[IP].payload):
             diff_count += 1
 

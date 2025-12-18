@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 def generate_pcap(filename="test_traffic.pcap", packet_count=20000):
     """
-    Generates a pcap file with random packets.
+    makes a pcap file full of random junk packets
     """
     logging.info(f"Generating {packet_count} packets for {filename}...")
     packets = []
@@ -19,13 +19,13 @@ def generate_pcap(filename="test_traffic.pcap", packet_count=20000):
         #dst_ip = f"127.0.0.{random.randint(1, 254)}"
         dst_ip = "127.0.0.1"
         
-        # Randomize ports
+        # random ports
         sport = random.randint(1024, 65535)
         #dport = random.randint(1024, 65535)
         dport = 12345
         
-        # Random payload
-        payload_size = random.randint(16, 128) # Keep it small for easy debugging, but variable
+        # random data payload
+        payload_size = random.randint(16, 128) # keep it small so we can read it if needed
         payload = os.urandom(payload_size)
         
         # Create packet (Ethernet/IP/UDP) - using UDP for simplicity, but TCP works too
