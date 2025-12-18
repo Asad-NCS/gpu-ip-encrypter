@@ -1,7 +1,7 @@
 # gpu-ip-encrypter
 packets generated transferred encrypted decrypter why are you even reading this
 
-# Simple Usage Guide
+# Simple Usage Guide-make sure u have cuda and venv if u want in ur project...
 
 ## 1. Setup
 1.  Open `config.py`.
