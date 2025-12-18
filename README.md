@@ -14,8 +14,9 @@ You only need to run **ONE** script now:
 .\run.ps1
 ```
 
-*   **On the Receiver Computer:** Select Option **2**.
 *   **On the Sender Computer:** Select Option **1**.
+*   **On the Receiver Computer:** Select Option **2**.
+*   **for local run:** Select Option **3**
 
 That's it! The script will handle opening all the necessary windows for you.
 
