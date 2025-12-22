@@ -56,8 +56,8 @@ def send_file(filename):
                 if bytes_sent % config.PROGRESS_INTERVAL_BYTES < chunk_size:
                     logging.info(f"Sent {bytes_sent}/{file_size} bytes ({100*bytes_sent//file_size}%)")
                 
-                # tiny sleep to prevent packet loss on the other end
-                time.sleep(0.005)
+                # slightly more delay to ensure 100% reliability on the receiving end
+                time.sleep(0.01)
         
         logging.info(f"File transfer complete: {bytes_sent} bytes sent")
         logging.info("Waiting 5 seconds before closing to ensure all packets arrive...")

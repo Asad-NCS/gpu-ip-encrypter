@@ -38,6 +38,9 @@ def receive_file(output_filename):
     bind_port = config.DESTINATION_PORT
 
     try:
+        # Increase receive buffer size to prevent packet loss
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, config.SOCKET_BUFFER_SIZE)
+        
         sock.bind((bind_host, bind_port))
         # Set timeout to 5 seconds to automatically close when transfer finishes
         sock.settimeout(5.0)

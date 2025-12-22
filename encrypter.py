@@ -28,7 +28,7 @@ logging.basicConfig(
 def ip_to_bytes(ip):
     return socket.inet_aton(ip)
 
-#this new does added later to convert bytes to ip address
+#this new code added later to convert bytes to ip address
 def bytes_to_ip(b):
     return socket.inet_ntoa(b)
 
@@ -55,6 +55,9 @@ def start_encrypter():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
+        # Increase receive buffer size to prevent packet loss during bursts
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, config.SOCKET_BUFFER_SIZE)
+        
         sock.bind((config.ENCRYPTER_HOST, config.ENCRYPTER_PORT))
         logging.info(f"Encrypter listening on {config.ENCRYPTER_HOST}:{config.ENCRYPTER_PORT}")
         

@@ -1,4 +1,16 @@
-param([string]$File = "C:\Users\asada\Videos\2025-01-01 23-50-16.mkv")#change this to your test file
+param([string]$File = "C:\Users\asada\Videos\10 Minutes Of Beautiful Nature Scenes 4K HD Short Video (2021) Relax Video.mp4")#change this to your test file
+
+# --- CLEANUP PREVIOUS RUNS ---
+Write-Host "Cleaning up previous sessions..." -ForegroundColor Cyan
+$titles = @("ENCRYPTER*", "DECRYPTER*", "FILE SENDER*", "FILE RECEIVER*")
+foreach ($title in $titles) {
+    Get-Process | Where-Object { $_.MainWindowTitle -like $title } | Stop-Process -Force -ErrorAction SilentlyContinue
+}
+Start-Sleep -Milliseconds 500
+
+# --- FILENAME SETUP ---
+$targetFileName = [System.IO.Path]::GetFileName($File)
+if (-not $targetFileName) { $targetFileName = "received_file.bin" } # fallback
 
 # if you have different versions of cuda/msvc, change these paths
 # otherwise just comment them out if your env vars are already set
@@ -40,7 +52,7 @@ switch ($choice) {
         
         # start receiver
         Write-Host "Launching File Receiver..."
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { `$host.UI.RawUI.WindowTitle = 'FILE RECEIVER'; & '$venvPy' file_receiver.py 'received_file.mp4' }"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { `$host.UI.RawUI.WindowTitle = 'FILE RECEIVER'; & '$venvPy' file_receiver.py '$targetFileName' }"
         
         # start decrypter
         Write-Host "Launching Decrypter..."
@@ -51,7 +63,7 @@ switch ($choice) {
         Write-Host "Running everything locally..."
         
         # receiver stuff
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { `$host.UI.RawUI.WindowTitle = 'FILE RECEIVER'; & '$venvPy' file_receiver.py 'received_file.mp4' }"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { `$host.UI.RawUI.WindowTitle = 'FILE RECEIVER'; & '$venvPy' file_receiver.py '$targetFileName' }"
         Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { `$host.UI.RawUI.WindowTitle = 'DECRYPTER'; & '$venvPy' decrypter.py }"
         
         Start-Sleep -Seconds 2

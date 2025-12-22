@@ -51,6 +51,9 @@ def start_decrypter():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
+        # Increase receive buffer size to prevent packet loss during bursts
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, config.SOCKET_BUFFER_SIZE)
+        
         sock.bind((config.DECRYPTER_HOST, config.DECRYPTER_PORT))
         logging.info(f"Decrypter listening on {config.DECRYPTER_HOST}:{config.DECRYPTER_PORT}")
         

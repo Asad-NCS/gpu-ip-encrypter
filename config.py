@@ -31,3 +31,4 @@ AES_KEY = b'thisisasecretkey' # Must be 16, 24, or 32 bytes
 # File Transfer Configuration
 CHUNK_SIZE = 8192#set to 8kb safe spot on udp
 PROGRESS_INTERVAL_BYTES = 10 * 1024 * 1024 # 10 MB #just tells how often terminal says "sent 1"
+SOCKET_BUFFER_SIZE = 16 * 1024 * 1024 # 16 MB buffer to prevent packet loss
